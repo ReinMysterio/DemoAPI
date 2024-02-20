@@ -1,6 +1,5 @@
-﻿using DemoAPI.DataAccess;
-using DemoAPI.Models;
-using Microsoft.AspNetCore.Http;
+﻿using DemoAPI.Models;
+using DemoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DemoAPI.Controllers
@@ -9,34 +8,73 @@ namespace DemoAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        [HttpGet]
-        [Route("GetUser/{email}")]
-        public User GetUser(string email)
-        {
-            return new User
-            {
-                Name = "John Doe",
-                Email = email,
-                Password = "password",
-            };
-        }
+        private readonly UserService _userService;
 
-        [HttpPost("AddUser")]
-        public User AddUser([FromBody] User user)
+        public UsersController(UserService userService)
         {
-            return new User
-            {
-                Name = user.Name,
-                Email = user.Email,
-                Password = user.Password,
-            };
+            _userService = userService;
         }
 
         [HttpGet]
-        public string TestDBCall()
+        public IActionResult Get()
         {
-            var db = new DBContext();
-            return db.DbCall();
+            var users = _userService.GetAllUsers();
+
+            return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
+        {
+            var user = _userService.GetUserById(id);
+
+            if (user == null) 
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
+        [HttpPost]
+        public IActionResult AddUser([FromBody] User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _userService.AddUser(user);
+            return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateUser(string id, [FromBody] User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userToUpdate = _userService.GetUserById(id);
+            if (userToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_userService.UpdateUser(id, user));
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteUser(string id)
+        {
+            var userToDelete = _userService.GetUserById(id);
+            if (userToDelete == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_userService.DeleteUser(id));
         }
     }
 }
