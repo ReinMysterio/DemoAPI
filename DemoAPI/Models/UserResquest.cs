@@ -2,11 +2,8 @@
 
 namespace DemoAPI.Models
 {
-    public class User
+    public class UserResquest
     {
-        [Required(ErrorMessage = "Id is required.")]
-        public string Id { get; set; }
-
         [Required(ErrorMessage = "UserName is required.")]
         public string UserName { get; set; }
 

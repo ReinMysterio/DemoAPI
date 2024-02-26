@@ -37,7 +37,7 @@ namespace DemoAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddUser([FromBody] User user)
+        public IActionResult AddUser([FromBody] UserResquest user)
         {
             if (!ModelState.IsValid)
             {
@@ -49,7 +49,7 @@ namespace DemoAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(string id, [FromBody] User user)
+        public IActionResult UpdateUser(string id, [FromBody] UserResquest user)
         {
             if (!ModelState.IsValid)
             {
@@ -75,6 +75,19 @@ namespace DemoAPI.Controllers
             }
 
             return Ok(_userService.DeleteUser(id));
+        }
+
+
+        [HttpPatch("{id}/{email}")]
+        public IActionResult PartialUpdateUser(string id, string email)
+        {
+            var userToUpdate = _userService.GetUserById(id);
+            if (userToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_userService.UpdateEmail(id, email));
         }
     }
 }
