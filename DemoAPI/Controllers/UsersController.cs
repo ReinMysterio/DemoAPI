@@ -1,11 +1,14 @@
-﻿using DemoAPI.Models;
+﻿using DemoAPI.Attributes;
+using DemoAPI.Models;
 using DemoAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DemoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
@@ -15,6 +18,7 @@ namespace DemoAPI.Controllers
             _userService = userService;
         }
 
+        [RoleCheck("Accountant")]
         [HttpGet]
         public IActionResult Get()
         {
@@ -23,6 +27,7 @@ namespace DemoAPI.Controllers
             return Ok(users);
         }
 
+        [RoleCheck("Accountant")]
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
@@ -36,6 +41,7 @@ namespace DemoAPI.Controllers
             return Ok(user);
         }
 
+        [RoleCheck("SuperAdmin")]
         [HttpPost]
         public IActionResult AddUser([FromBody] UserResquest user)
         {
@@ -48,6 +54,7 @@ namespace DemoAPI.Controllers
             return Ok(user);
         }
 
+        [RoleCheck("Admin")]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(string id, [FromBody] UserResquest user)
         {
@@ -65,6 +72,7 @@ namespace DemoAPI.Controllers
             return Ok(_userService.UpdateUser(id, user));
         }
 
+        [RoleCheck("SuperAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(string id)
         {
@@ -77,7 +85,7 @@ namespace DemoAPI.Controllers
             return Ok(_userService.DeleteUser(id));
         }
 
-
+        [RoleCheck("Admin")]
         [HttpPatch("{id}/{email}")]
         public IActionResult PartialUpdateUser(string id, string email)
         {
