@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
@@ -13,8 +8,27 @@ namespace DataAccess.Entities
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Department { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string JobTitle { get; set; }
+
+        [Required]
+        public decimal Salary { get; set; }
+
+        [Required]
+        public DateTime HireDate { get; set; }
+
+        public string UserId { get; set; }
+
+        [ForeignKey("Id")]
+        [Required]
+        public virtual User User { get; set; }
+
+        public virtual ICollection<Project> Projects { get; set; }
     }
 }

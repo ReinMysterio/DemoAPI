@@ -1,4 +1,5 @@
 ﻿using DataAccess.Context;
+using DataAccess.Entities;
 using DemoAPI.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,17 +28,19 @@ namespace DemoAPI.Services
                 return false;
             }
 
-            token = GenerateToken();
+            token = GenerateToken(user);
             return BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password);
         }
 
-        private string GenerateToken()
+        private string GenerateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(ClaimTypes.Role, "Admin"),                
+                new Claim(ClaimTypes.Role, $"{(int)user.RoleType}"),
+                new Claim("Email", user.Email),
+                new Claim("UserName", user.UserName),
             };
 
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], 

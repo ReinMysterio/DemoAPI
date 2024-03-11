@@ -1,16 +1,12 @@
-﻿using DataAccess.Enums;
-using DemoAPI.Attributes;
-using DemoAPI.Models;
+﻿using DemoAPI.Models;
 using DemoAPI.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DemoAPI.Controllers
+namespace DemoAPI.Controllers.V2
 {
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/v{v:apiversion}/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
@@ -20,16 +16,37 @@ namespace DemoAPI.Controllers
             _userService = userService;
         }
 
-        [RoleCheck(RoleType.Accountant, RoleType.SuperAdmin)]
         [HttpGet]
         public IActionResult Get()
         {
-            var users = _userService.GetAllUsers();
+            var users = new UserEmployeeResponse[]
+            {
+                    new UserEmployeeResponse
+                    {
+                        Id = "1",
+                        UserName = "user1",
+                        Name = "User 1",
+                        Email = ""
+                    },
+                    new UserEmployeeResponse
+                    {
+                        Id = "2",
+                        UserName = "user2",
+                        Name = "User 2",
+                        Email = ""
+                    },
+                     new UserEmployeeResponse
+                     {
+                        Id = "3",
+                        UserName = "user3",
+                        Name = "User 3",
+                        Email = ""
+                    }
+            };
 
             return Ok(users);
         }
 
-        [RoleCheck(RoleType.Accountant)]
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {            
@@ -43,7 +60,6 @@ namespace DemoAPI.Controllers
             return Ok(user);
         }
 
-        [RoleCheck(RoleType.SuperAdmin)]
         [HttpPost]
         public IActionResult AddUser([FromBody] UserResquest user)
         {
@@ -64,7 +80,6 @@ namespace DemoAPI.Controllers
 
         }
 
-        [RoleCheck(RoleType.Admin)]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(string id, [FromBody] UserResquest user)
         {
@@ -82,7 +97,6 @@ namespace DemoAPI.Controllers
             return Ok(_userService.UpdateUser(id, user));
         }
 
-        [RoleCheck(RoleType.SuperAdmin)]
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(string id)
         {
@@ -95,7 +109,6 @@ namespace DemoAPI.Controllers
             return Ok(_userService.DeleteUser(id));
         }
 
-        [RoleCheck(RoleType.Admin)]
         [HttpPatch("{id}/{email}")]
         public IActionResult PartialUpdateUser(string id, string email)
         {

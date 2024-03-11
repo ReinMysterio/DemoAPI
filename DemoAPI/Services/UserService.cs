@@ -3,6 +3,7 @@ using DataAccess.Entities;
 using DemoAPI.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace DemoAPI.Services
@@ -19,28 +20,59 @@ namespace DemoAPI.Services
 
         public IEnumerable<User> GetAllUsers()
         {
-            var users = _dbContext.Users.AsNoTracking().ToList();
+            var usersWithEmployee = _dbContext.Users.AsNoTracking().ToList();
 
-            foreach (var user in users)
+            foreach (var user in usersWithEmployee)
             {
                 user.Password = null;
             }
 
-            return users;
+            return usersWithEmployee;
         }
 
-        public User GetUserById(string id)
+        public UserEmployeeResponse GetUserById(string id)
         {
-            var user = _dbContext.Users.AsNoTracking().FirstOrDefault(u => u.Id == id);
-            if (user != null)
+            var user = _dbContext.Users
+                .Include(t => t.Employee)
+                    .ThenInclude(t => t.Projects)
+                .FirstOrDefault(u => u.Id == id);
+
+
+            if (user == null)
             {
-                user.Password = null;
+                return null;              
             }
-            return user;
+
+            return new UserEmployeeResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Name = user.Name,
+                Email = user.Email,
+                Department = user.Employee.Department,
+                HireDate = user.Employee.HireDate,
+                JobTitle = user.Employee.JobTitle,
+                Salary = user.Employee.Salary,
+                RoleType = user.RoleType.GetDisplayName(),
+                Projects = user.Employee.Projects.Select(p => new ProjectResponse
+                {
+                    ProjectId = p.Id,
+                    ProjectName = p.Name,
+                    ProjectStartDate = p.StartDate,
+                    ProjectEndDate = p.EndDate
+                }).ToList()
+
+            };
         }
 
         public void AddUser(UserResquest userRequest)
         {
+            var hasExistingUser = _dbContext.Users.Any(u => u.UserName == userRequest.UserName);
+            if (hasExistingUser)
+            {
+                throw new Exception("User already exists");
+            }
+
             var toAdd = new User
             {
                 Id = Guid.NewGuid().ToString(),

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DataAccess.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
@@ -6,16 +7,16 @@ namespace DemoAPI.Attributes
 {
     public class RoleCheckAttribute : AuthorizeAttribute, IAuthorizationFilter
     {
-        private readonly string _roleType;
+        private readonly RoleType[] _roleTypes;
 
-        public RoleCheckAttribute(string roleType)
+        public RoleCheckAttribute(params RoleType[] roleType)
         {
-            _roleType = roleType;
+            _roleTypes = roleType;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var hasAccess = context.HttpContext.User.Claims.Any(r => r.Type == ClaimTypes.Role && r.Value == _roleType);
+            var hasAccess = _roleTypes.Any(r => context.HttpContext.User.HasClaim(ClaimTypes.Role,$"{(int)r}"));          
 
             if (!hasAccess)
             {
