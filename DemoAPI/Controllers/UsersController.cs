@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DemoAPI.Controllers
 {
     [ApiVersion("1.0")]
+    //[Route("api/[controller]")]
     [Route("api/v{v:apiversion}/[controller]")]
     [ApiController]
     [Authorize]

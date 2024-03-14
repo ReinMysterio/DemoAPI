@@ -1,4 +1,5 @@
 ﻿using DataAccess.Enums;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,5 +30,8 @@ namespace DataAccess.Entities
         public RoleType RoleType { get; set; }
 
         public virtual Employee Employee { get; set; }
+
+        [Required]    
+        public string RefreshToken { get; set; }
     }
 }

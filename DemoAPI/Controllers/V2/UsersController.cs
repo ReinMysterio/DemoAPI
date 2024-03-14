@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DemoAPI.Controllers.V2
 {
     [ApiVersion("2.0")]
+    //[Route("api/[controller]")]
     [Route("api/v{v:apiversion}/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
