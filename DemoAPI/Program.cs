@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration[JwtConstants.Issuer],
             ValidAudience = builder.Configuration[JwtConstants.Audience],
             ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(JwtConstants.Secret))
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration[JwtConstants.Secret]))
         };
     });
 builder.Services.AddApiVersioning(options =>
